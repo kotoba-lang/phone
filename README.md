@@ -15,6 +15,17 @@ No network, no I/O. The library expects international-form input (a leading
 translation is the operator's numbering-plan concern, not the contract layer.
 Portable `.cljc` across JVM / ClojureScript / SCI / GraalVM.
 
+
+## Maturity
+
+| | |
+|---|---|
+| Role | capability |
+| Tests | 41 assertions, all green |
+| Operator console (UI/UX) | yes |
+| Export (CSV/JSON) | yes |
+| Shared CSS design system | yes (css.core/operator-theme) |
+
 ## Contract
 
 ```clojure
