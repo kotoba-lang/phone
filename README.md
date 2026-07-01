@@ -28,6 +28,37 @@ Portable `.cljc` across JVM / ClojureScript / SCI / GraalVM.
 (phone/validate-e164 "x")                      ; => {:phone/valid? false ...}
 ```
 
+## Operator console (UI/UX)
+
+A read-only HTML dashboard renders E.164 validation, recent calls (CDR) and SMS for an operator. Built on
+[`kotoba-lang/html`](https://github.com/kotoba-lang/html) (Hiccup→HTML) +
+[`kotoba-lang/css`](https://github.com/kotoba-lang/css) (EDN→CSS). Pure data
+→ markup; the console never exposes a write surface (no `<form>`/`<button>`)
+— writes stay behind the governor.
+
+```clojure
+(require '[kotoba.phone.ui :as ui])
+
+(ui/dashboard
+  {:numbers ["+442079460958" "bad"]
+   :cdrs [(phone/cdr "C1" "+8190A" "+8190B" :outbound 120)]
+   :sms [(phone/sms "S1" "+8190A" "+8190B" "hi")]})
+;; => "<html>...read-only · governor-gated...</html>"
+```
+
+## Export (CSV / JSON)
+
+Audit-grade CSV (RFC-4180 quoting) and JSON (quote/backslash/newline
+escaped) for E.164 validation, CDRs and SMS.
+
+```clojure
+(require '[kotoba.phone.export :as ex])
+
+(ex/numbers->csv numbers)  ; valid/normalized
+(ex/cdrs->csv cdrs)
+(ex/numbers->json numbers)
+```
+
 ## Why
 
 A community telecom operator must prove, before a call or message is
