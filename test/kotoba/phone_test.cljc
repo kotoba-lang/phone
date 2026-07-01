@@ -52,3 +52,15 @@
 (deftest validate-e164-test
   (is (true? (:phone/valid? (phone/validate-e164 "+442079460958"))))
   (is (= :malformed-e164 (:phone/error (phone/validate-e164 "x")))))
+
+(deftest e164-edge-cases
+  (testing "6-digit minimum is accepted"
+    (is (phone/e164-valid? "+440000")))
+  (testing "5 digits is too short"
+    (is (not (phone/e164-valid? "+44000"))))
+  (testing "15-digit maximum is accepted"
+    (is (phone/e164-valid? "+441234567890123")))
+  (testing "16 digits is too long"
+    (is (not (phone/e164-valid? "+4412345678901234"))))
+  (testing "national trunk prefix 0 is not parseable as E.164"
+    (is (nil? (phone/parse-e164 "09012345678")))))
