@@ -81,3 +81,9 @@ pure-data layer a `PolicyGovernor` checks against; the actor
 ## License
 
 Apache License 2.0.
+
+## Test
+
+```bash
+clojure -M:test
+```
