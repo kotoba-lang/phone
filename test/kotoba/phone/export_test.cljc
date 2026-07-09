@@ -8,6 +8,16 @@
     (is (re-find #"number,valid,normalized" csv))
     (is (re-find #"\+442079460958,yes" csv))
     (is (re-find #"bad,no" csv))))
+(deftest csv-export-quotes-a-bare-carriage-return
+  ;; RFC 4180 requires quoting a field containing CR, LF, or a comma --
+  ;; \r alone is also a line terminator every standard CSV reader
+  ;; recognizes, but the check here only ever covered \n. Verified
+  ;; against Python's csv module: an unquoted bare \r split the row into
+  ;; two corrupted rows on read-back.
+  (let [cs [(phone/cdr (str "C" (char 13) "1")
+              "+15551234567" "+15557654321" :outbound 60)]
+        csv (ex/cdrs->csv cs)]
+    (is (str/includes? csv "\"C\r1\""))))
 (deftest json-export
   (let [j (ex/numbers->json ["+442079460958"])]
     (is (re-find #"\"valid\":true" j))))
