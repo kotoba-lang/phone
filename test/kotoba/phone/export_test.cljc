@@ -1,5 +1,6 @@
 (ns kotoba.phone.export-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [clojure.string :as str]
+            [clojure.test :refer [deftest is testing]]
             [kotoba.phone :as phone]
             [kotoba.phone.export :as ex]))
 (deftest csv-export
@@ -10,3 +11,12 @@
 (deftest json-export
   (let [j (ex/numbers->json ["+442079460958"])]
     (is (re-find #"\"valid\":true" j))))
+(deftest json-export-escapes-every-c0-control-character
+  ;; RFC 8259 requires EVERY control character U+0000-U+001F to be
+  ;; escaped, not just \ " and \n -- a CDR id containing a raw tab or
+  ;; other control byte would otherwise be copied through raw, producing
+  ;; invalid JSON (verified against Python's strict json module).
+  (let [cs [(phone/cdr (str "C" (char 9) "1" (char 1) "x")
+              "+15551234567" "+15557654321" :outbound 60)]
+        j (ex/cdrs->json cs)]
+    (is (str/includes? j "\"cdr_id\":\"C\\t1\\u0001x\""))))
